@@ -19,6 +19,18 @@ require 'dm-transactions'
 
 module DataMapper
   module DeepCloning
- 
+
+    DEFAULT_MODE = :new
+
+    def deep_clone(*args)
+      mode = args.shift if [:new, :create].include?(args.first)
+      mode ||= DEFAULT_MODE
+
+      self.class.send(mode, self.attributes.reject{|(k, v)| self.class.properties[k].key? })
+    end
+
   end # mod DeepCloning
+
+  DataMapper::Resource.send(:include, DeepCloning)
+
 end # mod DM

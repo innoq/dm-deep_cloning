@@ -25,20 +25,21 @@ require 'dm-migrations'
 class Post
   include DataMapper::Resource
 
-  property :id,       Serial
-
+  property :id,     Serial
+  property :author, String
+  property :title,  String
+  property :text,   Text
+  
   belongs_to :blog
-
   has n, :comments
-
   has n, :related_posts, "Post", :through => Resource
 end
 
 class Blog
   include DataMapper::Resource
-
-  property :id,       Serial
-
+  property :id,   Serial
+  
+  property :name, String
   has n, :posts
 end
 
@@ -46,6 +47,8 @@ class Comment
   include DataMapper::Resource
   
   property :id, Serial
+  property :author, String
+  property :text, Text
 
   belongs_to :blog
 end

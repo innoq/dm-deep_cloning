@@ -22,17 +22,34 @@ describe DataMapper::DeepCloning do
     DataMapper.auto_migrate!
   end
 
-  describe "bla" do
+  describe "non recursive cloning" do
 
-    before :each do
-#      Category.auto_migrate!
+    before(:all) do
+      @post = Post.create(:title => 'First post', :text => "Sun is shining...", :blog => Blog.create(:name => 'Test Blog'))
     end
 
-    it "blubb" do
+    it "should clone single objects unsaved" do
+      @cloned_post = @post.deep_clone()
 
+      @cloned_post.title.should == @post.title
+      @cloned_post.id.should == nil
+      @cloned_post.saved?.should == false
+
+      @cloned_post.save.should == true
+      @cloned_post.id.should_not be(@post.id)
+
+      @cloned_post.blog.id.should be(@post.blog.id)
     end
 
+    it "should clone single objects saved" do
+      @cloned_post = @post.deep_clone(:create)
 
+      @cloned_post.title.should == @post.title
+      @cloned_post.saved?.should == true
+      @cloned_post.id.should_not be(@post.id)
+
+      @cloned_post.blog.id.should be(@post.blog.id)
+    end
   end
 
 
