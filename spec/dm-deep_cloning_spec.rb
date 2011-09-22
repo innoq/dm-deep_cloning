@@ -25,32 +25,62 @@ describe DataMapper::DeepCloning do
   describe "non recursive cloning" do
 
     before(:all) do
-      @post = Post.create(:title => 'First post', :text => "Sun is shining...", :blog => Blog.create(:name => 'Test Blog'))
+      @blog = Blog.create(:name => 'Test Blog')
+      @post1 = Post.create(:title => 'First post', :text => "Sun is shining...", :blog => @blog)
+      @post2 = Post.create(:title => 'Second post', :text => "Now the moon is shining", :blog => @blog, :related_posts => [@post1])
     end
 
     it "should clone single objects unsaved" do
-      @cloned_post = @post.deep_clone()
+      cloned_post = @post1.deep_clone()
 
-      @cloned_post.title.should == @post.title
-      @cloned_post.id.should == nil
-      @cloned_post.saved?.should == false
+      cloned_post.title.should == @post1.title
+      cloned_post.id.should be_nil
+      cloned_post.saved?.should == false
 
-      @cloned_post.save.should == true
-      @cloned_post.id.should_not be(@post.id)
+      cloned_post.save.should == true
+      cloned_post.id.should_not be(@post1.id)
 
-      @cloned_post.blog.id.should be(@post.blog.id)
+      cloned_post.blog.id.should be(@post1.blog.id)
     end
 
     it "should clone single objects saved" do
-      @cloned_post = @post.deep_clone(:create)
+      cloned_post = @post1.deep_clone(:create)
 
-      @cloned_post.title.should == @post.title
-      @cloned_post.saved?.should == true
-      @cloned_post.id.should_not be(@post.id)
+      cloned_post.title.should == @post1.title
+      cloned_post.saved?.should == true
+      cloned_post.id.should_not be(@post1.id)
 
-      @cloned_post.blog.id.should be(@post.blog.id)
+      cloned_post.blog.id.should be(@post1.blog.id)
     end
+
+    it "should handle many to many relations" do
+      cloned_post = @post2.deep_clone(:create)
+
+      cloned_post.related_posts.map(&:id).should =~ [@post1.id]
+    end
+
   end
 
+  describe "recursive cloning" do
 
+    before(:all) do
+      @blog = Blog.create(:name => 'Test Blog')
+      @post1 = Post.create(:title => 'First post', :text => "Sun is shining...", :blog => @blog)
+      @post2 = Post.create(:title => 'Second post', :text => "Now the moon is shining", :blog => @blog, :related_posts => [@post1])
+    end
+
+    it "should handle many to many relations" do
+      cloned_post = @post2.deep_clone(:create, :related_posts)
+
+      cloned_post.related_posts.map(&:id).should_not include(@post1.id)
+      cloned_post.related_posts.map(&:title).should include(@post1.title)
+    end
+
+    it "should handle nested recursive relations" do
+      cloned_post = @post1.deep_clone(:create, :blog => :posts)
+
+      cloned_post.blog.posts.map(&:id).should_not include(@post1.id, @post2.id)
+    end
+
+  end
 end

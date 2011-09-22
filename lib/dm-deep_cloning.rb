@@ -16,6 +16,7 @@
 
 require 'dm-core'
 require 'dm-transactions'
+require 'data_mapper/deep_cloning/utilities'
 
 module DataMapper
   module DeepCloning
@@ -23,10 +24,47 @@ module DataMapper
     DEFAULT_MODE = :new
 
     def deep_clone(*args)
+      args_size = args.size # For error messages
+
       mode = args.shift if [:new, :create].include?(args.first)
       mode ||= DEFAULT_MODE
 
-      self.class.send(mode, self.attributes.reject{|(k, v)| self.class.properties[k].key? })
+      clone_relations = {}
+      args.each do |arg|
+        case arg
+        when Hash
+          Utilities::Hash.recursive_merge!(clone_relations, arg)
+        when Array
+          arg.each do |el|
+            clone_relations[el] = {}
+          end
+        when Symbol
+          clone_relations[arg] = {}
+        else
+          raise ArgumentError, "deep_clone only accepts Symbols, Hashes or Arrays"
+        end
+      end
+  
+      attributes = self.attributes.reject{|(k, v)| self.class.properties[k].key? }
+
+      self.class.relationships.each do |relationship|
+        if clone_relations.keys.include?(relationship.name)
+          case relationship
+          when DataMapper::Associations::OneToMany::Relationship, DataMapper::Associations::ManyToMany::Relationship
+            attributes[relationship.name] = self.send(relationship.name).map do |related_object|
+              related_object.deep_clone(mode, clone_relations[relationship.name])
+            end
+          when DataMapper::Associations::ManyToOne::Relationship
+            attributes[relationship.name] = self.send(relationship.name).deep_clone(mode, clone_relations[relationship.name])
+          else
+            raise "Deep cloning failed: Unknown relationship '#{relationship.class}' for relation '#{relationship.name}' in '#{self.class}'"
+          end
+        elsif relationship.is_a?(DataMapper::Associations::ManyToMany::Relationship) # We always need to clone many to many relationship entrys (but not targets of the relations)
+          attributes[relationship.name] = self.send(relationship.name)
+        end
+      end
+
+      self.class.send(mode, attributes)
     end
 
   end # mod DeepCloning
