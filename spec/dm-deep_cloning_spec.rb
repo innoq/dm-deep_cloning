@@ -82,5 +82,12 @@ describe DataMapper::DeepCloning do
       cloned_post.blog.posts.map(&:id).should_not include(@post1.id, @post2.id)
     end
 
+    it "should not save new objects if not specified" do
+      cloned_blog = @blog.deep_clone(:posts)
+
+      cloned_blog.saved?.should be(false)
+      cloned_blog.posts.map(&:saved?).should_not include(true)
+    end
+
   end
 end
