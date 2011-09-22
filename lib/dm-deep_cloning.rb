@@ -54,6 +54,12 @@ module DataMapper
             attributes[relationship.name] = self.send(relationship.name).map do |related_object|
               related_object.deep_clone(mode, clone_relations[relationship.name])
             end
+            if attributes[relationship.name].empty? 
+              # Delete the atrribute if no objects need to be assigned to the relation.
+              # dm-core seems to have a problem with Foo.new(:bars => []). Sadly
+              # this was not reproduceable in the specs.
+              attributes.delete(relationship.name)
+            end
           when DataMapper::Associations::ManyToOne::Relationship
             attributes[relationship.name] = self.send(relationship.name).deep_clone(mode, clone_relations[relationship.name])
           else

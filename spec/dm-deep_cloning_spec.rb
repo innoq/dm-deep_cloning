@@ -82,6 +82,13 @@ describe DataMapper::DeepCloning do
       cloned_post.blog.posts.map(&:id).should_not include(@post1.id, @post2.id)
     end
 
+    it "should be able to handle empty relations" do
+      emtpy_blog = Blog.create(:name => 'An empty blog')
+      cloned_blog = emtpy_blog.deep_clone(:posts)
+
+      cloned_blog.posts.should be_empty
+    end
+
     it "should not save new objects if not specified" do
       cloned_blog = @blog.deep_clone(:posts)
 
