@@ -15,21 +15,31 @@
 # limitations under the License.
 
 SOURCE         = ENV.fetch('SOURCE', :git).to_sym
-REPO_POSTFIX   = SOURCE == :path ? ''                                : '.git'
-DATAMAPPER     = SOURCE == :path ? Pathname(__FILE__).dirname.parent : 'http://github.com/datamapper'
-DM_VERSION     = '~> 1.2.0.rc1'
+
+DM_VERSION     = '~> 1.2.0'
+
 DO_VERSION     = '~> 0.10.6'
 DM_DO_ADAPTERS = %w[ sqlite postgres mysql oracle sqlserver ]
 
+def dm(module_name)
+  if SOURCE == :rubygems
+    gem "dm-module_name", DM_VERSION
+  elsif SOURCE == :path
+    gem "dm-#{module_name}", DM_VERSION, :path => Pathname(__FILE__).dirname.parent
+  else
+    gem "dm-#{module_name}", DM_VERSION, :git => "http://github.com/datamapper/dm-#{module_name}.git", :branch => ENV.fetch('BRANCH', 'master')
+  end
+end
+
 source 'http://rubygems.org'
 
-gem 'dm-core',             :git => 'git://github.com/datamapper/dm-core.git'
-gem 'dm-transactions',     :git => 'git://github.com/datamapper/dm-transactions.git'
+dm('core')
+dm('transactions')
 
 group :development, :test do
-  gem 'rake',                '~> 0.8.7'
-  gem 'jeweler',             '~> 1.4'
-  gem 'rspec',               '~> 1.3'
+  gem 'rake'
+  gem 'jeweler',           '~> 1.4'
+  gem 'rspec',             '~> 1.3'
 
   group :datamapper do
 
@@ -47,19 +57,19 @@ group :development, :test do
         gem "do_#{adapter}", DO_VERSION, do_options.dup
       end
 
-      gem 'dm-do-adapter', DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-do-adapter#{REPO_POSTFIX}"
+      dm('do-adapter')
     end
 
     adapters.each do |adapter|
       gem 'ruby-oci8', :platform => :ruby if adapter == 'oracle'
-      gem "dm-#{adapter}-adapter", DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-#{adapter}-adapter#{REPO_POSTFIX}"
+      dm("#{adapter}-adapter")
     end
 
     plugins = ENV['PLUGINS'] || ENV['PLUGIN']
-    plugins = plugins.to_s.tr(',', ' ').split.push('dm-migrations').uniq
+    plugins = plugins.to_s.tr(',', ' ').split.push('migrations', 'timestamps').uniq
 
     plugins.each do |plugin|
-      gem plugin, DM_VERSION, SOURCE => "#{DATAMAPPER}/#{plugin}#{REPO_POSTFIX}"
+      dm(plugin.gsub(/^dm-/, ""))
     end
 
   end
