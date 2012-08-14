@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SOURCE         = ENV.fetch('SOURCE', :git).to_sym
+SOURCE         = ENV.fetch('SOURCE', :rubygems).to_sym
 
 DM_VERSION     = '~> 1.2.0'
 
@@ -22,12 +22,12 @@ DO_VERSION     = '~> 0.10.6'
 DM_DO_ADAPTERS = %w[ sqlite postgres mysql oracle sqlserver ]
 
 def dm(module_name)
-  if SOURCE == :rubygems
-    gem "dm-module_name", DM_VERSION
+  if SOURCE == :git
+    gem "dm-#{module_name}", DM_VERSION, :git => "http://github.com/datamapper/dm-#{module_name}.git", :branch => ENV.fetch('BRANCH', 'master')
   elsif SOURCE == :path
     gem "dm-#{module_name}", DM_VERSION, :path => Pathname(__FILE__).dirname.parent
   else
-    gem "dm-#{module_name}", DM_VERSION, :git => "http://github.com/datamapper/dm-#{module_name}.git", :branch => ENV.fetch('BRANCH', 'master')
+    gem "dm-#{module_name}", DM_VERSION
   end
 end
 
