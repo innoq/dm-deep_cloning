@@ -4,19 +4,20 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{dm-deep_cloning}
-  s.version = "1.0.0"
+  s.name = "dm-deep_cloning"
+  s.version = "1.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Till Schulte-Coerne"]
-  s.date = %q{2011-09-22}
-  s.description = %q{A library that lets you clone objects and object graphs}
-  s.email = %q{till.schulte-coerne@innoq.com}
+  s.date = "2012-08-14"
+  s.description = "A library that lets you clone objects and object graphs"
+  s.email = "till.schulte-coerne@innoq.com"
   s.extra_rdoc_files = [
     "LICENSE",
     "README.md"
   ]
   s.files = [
+    ".travis.yml",
     "Gemfile",
     "LICENSE",
     "README.md",
@@ -36,44 +37,47 @@ Gem::Specification.new do |s|
     "tasks/yard.rake",
     "tasks/yardstick.rake"
   ]
-  s.homepage = %q{http://github.com/innoq/dm-deep_cloning}
+  s.homepage = "http://github.com/innoq/dm-deep_cloning"
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.5.2}
-  s.summary = %q{A deep cloning extension for datamapper}
+  s.rubygems_version = "1.8.10"
+  s.summary = "A deep cloning extension for datamapper"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<dm-core>, [">= 0"])
-      s.add_runtime_dependency(%q<dm-transactions>, [">= 0"])
-      s.add_development_dependency(%q<dm-migrations>, [">= 0"])
-      s.add_development_dependency(%q<rake>, ["~> 0.8.7"])
+      s.add_runtime_dependency(%q<dm-core>, ["~> 1.2.0"])
+      s.add_runtime_dependency(%q<dm-transactions>, ["~> 1.2.0"])
+      s.add_development_dependency(%q<rake>, [">= 0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.4"])
       s.add_development_dependency(%q<rspec>, ["~> 1.3"])
+      s.add_development_dependency(%q<dm-migrations>, ["~> 1.2.0"])
+      s.add_development_dependency(%q<dm-timestamps>, ["~> 1.2.0"])
       s.add_runtime_dependency(%q<dm-core>, ["~> 1.0"])
       s.add_runtime_dependency(%q<dm-transactions>, ["~> 1.0"])
       s.add_development_dependency(%q<rspec>, ["~> 1.2.9"])
       s.add_development_dependency(%q<dm-migrations>, ["~> 1.2.9"])
     else
-      s.add_dependency(%q<dm-core>, [">= 0"])
-      s.add_dependency(%q<dm-transactions>, [">= 0"])
-      s.add_dependency(%q<dm-migrations>, [">= 0"])
-      s.add_dependency(%q<rake>, ["~> 0.8.7"])
+      s.add_dependency(%q<dm-core>, ["~> 1.2.0"])
+      s.add_dependency(%q<dm-transactions>, ["~> 1.2.0"])
+      s.add_dependency(%q<rake>, [">= 0"])
       s.add_dependency(%q<jeweler>, ["~> 1.4"])
       s.add_dependency(%q<rspec>, ["~> 1.3"])
+      s.add_dependency(%q<dm-migrations>, ["~> 1.2.0"])
+      s.add_dependency(%q<dm-timestamps>, ["~> 1.2.0"])
       s.add_dependency(%q<dm-core>, ["~> 1.0"])
       s.add_dependency(%q<dm-transactions>, ["~> 1.0"])
       s.add_dependency(%q<rspec>, ["~> 1.2.9"])
       s.add_dependency(%q<dm-migrations>, ["~> 1.2.9"])
     end
   else
-    s.add_dependency(%q<dm-core>, [">= 0"])
-    s.add_dependency(%q<dm-transactions>, [">= 0"])
-    s.add_dependency(%q<dm-migrations>, [">= 0"])
-    s.add_dependency(%q<rake>, ["~> 0.8.7"])
+    s.add_dependency(%q<dm-core>, ["~> 1.2.0"])
+    s.add_dependency(%q<dm-transactions>, ["~> 1.2.0"])
+    s.add_dependency(%q<rake>, [">= 0"])
     s.add_dependency(%q<jeweler>, ["~> 1.4"])
     s.add_dependency(%q<rspec>, ["~> 1.3"])
+    s.add_dependency(%q<dm-migrations>, ["~> 1.2.0"])
+    s.add_dependency(%q<dm-timestamps>, ["~> 1.2.0"])
     s.add_dependency(%q<dm-core>, ["~> 1.0"])
     s.add_dependency(%q<dm-transactions>, ["~> 1.0"])
     s.add_dependency(%q<rspec>, ["~> 1.2.9"])
