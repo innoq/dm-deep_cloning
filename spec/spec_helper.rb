@@ -27,6 +27,8 @@ class Post
   include DataMapper::Resource
 
   property :id,     Serial
+  property :type,   Discriminator
+
   property :author, String
   property :title,  String
   property :text,   Text
@@ -36,6 +38,10 @@ class Post
   belongs_to :blog
   has n, :comments
   has n, :related_posts, "Post", :through => Resource
+end
+
+class SpecialPost < Post
+  property :secret, String
 end
 
 class Blog

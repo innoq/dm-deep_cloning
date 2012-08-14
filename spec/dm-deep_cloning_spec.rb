@@ -90,6 +90,17 @@ describe DataMapper::DeepCloning do
       cloned_blog.posts.should be_empty
     end
 
+    it "should work with STI" do
+      blog = Blog.create(:name => "test")
+      blog.posts << special_post = SpecialPost.create(:title => 'Special', :text => "Post", :secret => "Psst...", :blog => blog)
+
+      cloned_blog = blog.deep_clone(:create, :posts)
+
+      cloned_blog.posts.last.class.should be(SpecialPost)
+      cloned_blog.posts.last.should_not be(special_post)
+      cloned_blog.posts.last.secret.should be(special_post.secret)
+    end
+
     it "should not save new objects if not specified" do
       *old_counts = Blog.count, Post.count
 
