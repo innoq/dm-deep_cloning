@@ -53,12 +53,6 @@ describe DataMapper::DeepCloning do
       cloned_post.blog.id.should be(@post1.blog.id)
     end
 
-    it "should handle many to many relations" do
-      cloned_post = @post2.deep_clone(:create)
-
-      cloned_post.related_posts.map(&:id).should =~ [@post1.id]
-    end
-
     it "should not clone timestamps" do
       cloned_post = @post2.deep_clone(:create)
 

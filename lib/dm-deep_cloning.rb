@@ -49,26 +49,24 @@ module DataMapper
         self.class.properties[k].key? || k.to_s =~ /^(updated|created)_(at|on)$/
       }
 
-      self.class.relationships.each do |relationship|
-        if clone_relations.keys.include?(relationship.name)
-          case relationship
-          when DataMapper::Associations::OneToMany::Relationship, DataMapper::Associations::ManyToMany::Relationship
-            attributes[relationship.name] = self.send(relationship.name).map do |related_object|
-              related_object.deep_clone(mode, clone_relations[relationship.name])
-            end
-            if attributes[relationship.name].empty? 
-              # Delete the atrribute if no objects need to be assigned to the relation.
-              # dm-core seems to have a problem with Foo.new(:bars => []). Sadly
-              # this was not reproduceable in the specs.
-              attributes.delete(relationship.name)
-            end
-          when DataMapper::Associations::ManyToOne::Relationship
-            attributes[relationship.name] = self.send(relationship.name).deep_clone(mode, clone_relations[relationship.name])
-          else
-            raise "Deep cloning failed: Unknown relationship '#{relationship.class}' for relation '#{relationship.name}' in '#{self.class}'"
+      clone_relations.keys.each do |relationship_name|
+        relationship = self.class.relationships[relationship_name]
+
+        case relationship
+        when DataMapper::Associations::OneToMany::Relationship, DataMapper::Associations::ManyToMany::Relationship
+          attributes[relationship.name] = self.send(relationship.name).map do |related_object|
+            related_object.deep_clone(mode, clone_relations[relationship.name])
           end
-        elsif relationship.is_a?(DataMapper::Associations::ManyToMany::Relationship) # We always need to clone many to many relationship entrys (but not targets of the relations)
-          attributes[relationship.name] = self.send(relationship.name)
+          if attributes[relationship.name].empty?
+            # Delete the atrribute if no objects need to be assigned to the relation.
+            # dm-core seems to have a problem with Foo.new(:bars => []). Sadly
+            # this was not reproduceable in the specs.
+            attributes.delete(relationship.name)
+          end
+        when DataMapper::Associations::ManyToOne::Relationship
+          attributes[relationship.name] = self.send(relationship.name).deep_clone(mode, clone_relations[relationship.name])
+        else
+          raise "Deep cloning failed: Unknown relationship '#{relationship.class}' for relation '#{relationship.name}' in '#{self.class}'"
         end
       end
 
