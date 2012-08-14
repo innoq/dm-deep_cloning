@@ -59,6 +59,13 @@ describe DataMapper::DeepCloning do
       cloned_post.related_posts.map(&:id).should =~ [@post1.id]
     end
 
+    it "should not clone timestamps" do
+      cloned_post = @post2.deep_clone(:create)
+
+      cloned_post.created_at.should_not be_nil
+      cloned_post.created_at.should_not be(@post2.created_at)
+    end
+
   end
 
   describe "recursive cloning" do

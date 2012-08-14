@@ -45,7 +45,9 @@ module DataMapper
         end
       end
   
-      attributes = self.attributes.reject{|(k, v)| self.class.properties[k].key? }
+      attributes = self.attributes.reject{ |(k, v)|
+        self.class.properties[k].key? || k.to_s =~ /^(updated|created)_(at|on)$/
+      }
 
       self.class.relationships.each do |relationship|
         if clone_relations.keys.include?(relationship.name)

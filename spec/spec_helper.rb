@@ -20,6 +20,7 @@ require 'dm-core/spec/setup'
 DataMapper::Spec.setup
 
 require 'dm-migrations'
+require 'dm-timestamps'
 
 # classes/vars for tests
 class Post
@@ -29,6 +30,8 @@ class Post
   property :author, String
   property :title,  String
   property :text,   Text
+
+  timestamps :at
   
   belongs_to :blog
   has n, :comments
@@ -38,8 +41,8 @@ end
 class Blog
   include DataMapper::Resource
   property :id,   Serial
-  
   property :name, String
+
   has n, :posts
 end
 
