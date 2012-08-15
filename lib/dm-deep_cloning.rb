@@ -24,8 +24,6 @@ module DataMapper
     DEFAULT_MODE = :new
 
     def deep_clone(*args)
-      args_size = args.size # For error messages
-
       mode = args.shift if [:new, :create].include?(args.first)
       mode ||= DEFAULT_MODE
 
@@ -45,7 +43,7 @@ module DataMapper
         end
       end
   
-      attributes = self.attributes.reject{ |(k, v)|
+      attrs = self.attributes.reject{ |(k, v)|
         self.class.properties[k].key? || k.to_s =~ /^(updated|created)_(at|on)$/
       }
 
@@ -54,23 +52,29 @@ module DataMapper
 
         case relationship
         when DataMapper::Associations::OneToMany::Relationship, DataMapper::Associations::ManyToMany::Relationship
-          attributes[relationship.name] = self.send(relationship.name).map do |related_object|
+          attrs[relationship.name] = self.send(relationship.name).to_a.map do |related_object|
+            # Q: Why `to_a`????
+            # A: This is used to indirectly disable `eager_load` in the `attributes` method called in the following recursive call.
+            # Q: Aha!!! But why???
+            # A: It simply doesn't work with STI.
+            # Q: f***!
+            # A: Yea! Took me 3 hours.
             related_object.deep_clone(mode, clone_relations[relationship.name])
           end
-          if attributes[relationship.name].empty?
+          if attrs[relationship.name].empty?
             # Delete the atrribute if no objects need to be assigned to the relation.
             # dm-core seems to have a problem with Foo.new(:bars => []). Sadly
             # this was not reproduceable in the specs.
-            attributes.delete(relationship.name)
+            attrs.delete(relationship.name)
           end
         when DataMapper::Associations::ManyToOne::Relationship
-          attributes[relationship.name] = self.send(relationship.name).deep_clone(mode, clone_relations[relationship.name])
+          attrs[relationship.name] = self.send(relationship.name).deep_clone(mode, clone_relations[relationship.name])
         else
-          raise "Deep cloning failed: Unknown relationship '#{relationship.class}' for relation '#{relationship.name}' in '#{self.class}'"
+          raise "Deep cloning failed: Unknown relationship '#{relationship_name}' in '#{self.class}'"
         end
       end
 
-      self.class.send(mode, attributes)
+      self.class.send(mode, attrs)
     end
 
   end # mod DeepCloning
