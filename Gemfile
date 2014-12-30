@@ -16,7 +16,7 @@
 
 SOURCE         = ENV.fetch('SOURCE', :rubygems).to_sym
 
-DM_VERSION     = '~> 1.2.0'
+DM_VERSION     = '~> 1.2'
 
 DO_VERSION     = '~> 0.10.6'
 DM_DO_ADAPTERS = %w[ sqlite postgres mysql oracle sqlserver ]
@@ -31,14 +31,13 @@ def dm(module_name)
   end
 end
 
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 dm('core')
 dm('transactions')
 
 group :development, :test do
   gem 'rake'
-  gem 'jeweler',           '~> 1.4'
   gem 'rspec',             '~> 1.3'
 
   group :datamapper do
