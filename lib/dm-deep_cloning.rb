@@ -42,7 +42,7 @@ module DataMapper
           raise ArgumentError, "deep_clone only accepts Symbols, Hashes or Arrays"
         end
       end
-  
+
       attrs = self.attributes.reject{ |(k, v)|
         self.class.properties[k].key? || k.to_s =~ /^(updated|created)_(at|on)$/
       }
@@ -72,6 +72,10 @@ module DataMapper
         else
           raise "Deep cloning failed: Unknown relationship '#{relationship_name}' in '#{self.class}'"
         end
+      end
+
+      if DataMapper.const_defined?(:Is) && DataMapper::Is.const_defined?(:List) && self.class.is(DataMapper::Is::List)
+        attrs.delete(:position) # Pre-Setting positions doesn't work in DM::Is::List
       end
 
       self.class.send(mode, attrs)
