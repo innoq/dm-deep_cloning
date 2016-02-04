@@ -74,7 +74,7 @@ module DataMapper
         end
       end
 
-      if DataMapper.const_defined?(:Is) && DataMapper::Is.const_defined?(:List) && self.class.is(DataMapper::Is::List)
+      if DataMapper.const_defined?(:Is) && DataMapper::Is.const_defined?(:List) && self.class.is_a?(DataMapper::Is::List)
         attrs.delete(:position) # Pre-Setting positions doesn't work in DM::Is::List
       end
 
